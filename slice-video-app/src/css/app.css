@@ -1,0 +1,32 @@
+body {
+  background-color: #EEF2F7;
+}
+.app {
+  background-color: #fff;
+  padding: 20px;
+  width: 600px;
+  margin: 0px auto;
+}
+
+.player {
+  padding: 20px;
+  text-align: center;
+  background-color: #ccc;
+}
+
+.header {
+  background-color: #01005D;
+  padding: 10px;
+  color: white;
+}
+
+.title {
+  font-size: 1.5em;
+  text-align: center;
+  vertical-align: middle;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+video {
+  background-color: aqua;
+}
