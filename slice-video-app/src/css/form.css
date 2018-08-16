@@ -1,7 +1,14 @@
 .form {
-  background-color: #ffcccc;
+  padding: 20px;
+  border: #ccc 3px solid;
+  width: 200px;
+  background-color: #fcfcfc;
 }
 
 .form-item {
-  background-color: red;
+  padding: 5px; 
+}
+
+.duration {
+  font-size: 12px;
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../../css/app.css';
 import Clip from '../Clip'
 import Form from '../Form'
+const uuidv1 = require('uuid/v1')
 
 class App extends Component {
   constructor(props) {
@@ -18,21 +19,16 @@ class App extends Component {
           id: 0,
           title: 'Original video',
           start: '00:00:00',
-          end: '00:00:06'
+          end: '00:00:52'
         },
         {
           id: 1,
-          title: 'Clip 02',
+          title: 'Clip 02 seconds',
           start: '00:00:08',
           end: '00:00:10'
         }
       ],
-      clip: {
-        id: 0,
-        title: 'Original video',
-        start: '00:00:00',
-        end: '00:00:06'
-      }
+      clip: null
     }
 
     this.handlePlay = this.handlePlay.bind(this)
@@ -42,44 +38,65 @@ class App extends Component {
   }
 
   handlePlay(event) {
-    const id = parseInt(event.target.id, 10)
+    const id = event.target.id
     const clip = this.state.clips.find((clipState) => {
-      return id === clipState.id
+      return id == clipState.id
     })
     this.setState({
       clip,
       mode: "playing"
     })
+
     document.getElementById("video").currentTime = this.timeToSeconds(clip.start)
     document.getElementById("video").play()
+    const leftTime = this.timeToSeconds(clip.end) - this.timeToSeconds(clip.start)
+    setTimeout(function() {
+      document.getElementById("video").pause()
+    }, ((leftTime * 1000) + 1000))
   }
 
   handleRemove(event) {
-    const id = parseInt(event.target.id, 10)
+    const id = event.target.id
     if(id !== 0) {
       const clips = this.state.clips.filter(function (clip) {
-        return clip.id !== id;
+        return clip.id != id;
       })
       this.setState({ clips }) 
     }
   }
 
-  handleForm(event) {
-    if(event.target.clip) {
-      this.setState({mode: 'editing'})
+  handleForm(data, event) {
+    if(data.id) {
+      this.setState({
+        mode: 'editing',
+        clip: data
+      })
     } else {
-      this.setState({mode: 'adding'})
+      this.setState({
+        mode: 'adding',
+        clip: null
+      })
     }
   }
 
   handleSave(clip, event) {
     let clips = this.state.clips
     if(clip.id == 0) {
-      clip.id = this.state.clips.length
+      clip.id = uuidv1();
+      clips.push(clip)
+    } else {
+      clips.map(c => {
+        if(c.id == clip.id) {
+          c = clip
+        }
+      })
     }
-    clips.push(clip)
-    console.log(clips)
-    this.setState({ clips })
+    
+    this.setState({
+      clip,
+      clips,
+      mode: 'playing'
+    })
   }
 
   timeToSeconds(time) {
@@ -88,8 +105,6 @@ class App extends Component {
   }
 
   render() {
-    let videoSource = this.state.videoUrl
-
     return (
       <div className="app">
         <header className="header">
@@ -100,10 +115,9 @@ class App extends Component {
             id="video"
             width="500px"
             controls
-            autoPlay
-            key={videoSource}>
+            autoPlay>
             <source
-              src={ videoSource } />
+              src={ this.state.videoUrl } />
           </video>
         </div>
         <div className="clips-list">
@@ -114,6 +128,7 @@ class App extends Component {
                   data={clip}
                   handlePlay={this.handlePlay}
                   handleRemove={this.handleRemove}
+                  handleForm={this.handleForm}
                   key={i} />
               )
             })
@@ -122,6 +137,7 @@ class App extends Component {
             this.state.mode !== "playing"
             ?
             <Form
+              clip={this.state.clip}
               mode={this.state.mode}
               handleSave={this.handleSave} />
             :

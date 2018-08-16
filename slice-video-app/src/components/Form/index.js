@@ -7,7 +7,7 @@ class Form extends Component {
     this.state = {
       clip: {
         id: 0,
-        title: 'Original video',
+        title: '',
         start: '00:00:00',
         end: '00:00:06'
       }
@@ -22,9 +22,25 @@ class Form extends Component {
     this.setState({'clip': clip})
   }
 
-  componentWillMount() {
+  componentDidMount() {
     document.getElementById("video").pause()
-    //this.setState({clip: this.props.data})
+
+    if(this.props.clip) {
+      this.setState({ clip: this.props.clip })
+    } else {
+      let clip = this.state.clip
+      const date = new Date()
+      clip.title = "New video - " + date.toLocaleString()
+      this.setState({ clip })
+    }
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.clip != this.props.clip) {
+      if(newProps.clip) {
+        this.setState({clip: newProps.clip}) 
+      }
+    }
   }
 
   timeToSeconds(time) {
